@@ -516,6 +516,57 @@ fn print_dir(app: &AppHandle) -> Result<PathBuf, String> {
     Ok(dir)
 }
 
+/// One headless run of the browser: page in, PDF out.
+///
+/// The profile folder is new for every run and lives in the system temp
+/// folder. A profile that is reused keeps lock files (SingletonLock and
+/// friends); if an earlier run was killed, overlapped this one, or the folder
+/// sits somewhere the browser can't put its socket, the browser aborts with
+/// "Failed to create a ProcessSingleton for your profile directory" and prints
+/// nothing. Without any private profile, a headless launch just pokes the
+/// Chrome that's already open and exits.
+async fn browser_to_pdf(browser: &Path, page_url: &str, pdf_path: &Path, attempt: u32) -> Result<(), String> {
+    let profile = std::env::temp_dir().join(format!("mdn-print-{}-{}-{attempt}", std::process::id(), chrono::Utc::now().timestamp_millis()));
+    let _ = std::fs::remove_file(pdf_path);
+
+    let mut cmd = tokio::process::Command::new(browser);
+    paths::quiet_async(&mut cmd);
+    cmd.arg("--headless=new")
+        .arg("--disable-gpu")
+        .arg("--no-first-run")
+        .arg("--no-default-browser-check")
+        .arg("--disable-extensions")
+        .arg("--disable-background-networking")
+        .arg("--hide-scrollbars")
+        .arg("--no-pdf-header-footer")
+        .arg("--print-to-pdf-no-header")
+        .arg("--virtual-time-budget=25000")
+        .arg(format!("--user-data-dir={}", profile.display()))
+        .arg(format!("--print-to-pdf={}", pdf_path.display()))
+        .arg(page_url)
+        .stdin(Stdio::null())
+        .stdout(Stdio::null())
+        .stderr(Stdio::piped())
+        .kill_on_drop(true);
+    if cfg!(target_os = "linux") {
+        cmd.arg("--no-sandbox");
+    }
+
+    let result = tokio::time::timeout(Duration::from_secs(90), cmd.output()).await;
+    let _ = std::fs::remove_dir_all(&profile);
+    let out = result
+        .map_err(|_| "The browser took more than 90 seconds to make the PDF.".to_string())?
+        .map_err(|e| format!("Couldn't start {}: {e}", browser.display()))?;
+
+    let size = std::fs::metadata(pdf_path).map(|m| m.len()).unwrap_or(0);
+    if size < 2_000 {
+        let err = String::from_utf8_lossy(&out.stderr);
+        let tail: Vec<&str> = err.lines().rev().take(3).collect();
+        return Err(format!("The browser didn't produce a PDF. {}", wire::truncate(&tail.join(" | "), 300)));
+    }
+    Ok(())
+}
+
 /// Render the edition and have the browser print it to a PDF. Returns the PDF path.
 pub async fn make_pdf(app: &AppHandle, edition: &Edition) -> Result<PathBuf, String> {
     let settings = store::load_settings(app);
@@ -542,42 +593,25 @@ pub async fn make_pdf(app: &AppHandle, edition: &Edition) -> Result<PathBuf, Str
     let _ = std::fs::remove_file(&pdf_path);
 
     let file_url = url::Url::from_file_path(&html_path).map_err(|_| "Couldn't build a file:// address for the print page.".to_string())?;
-    // A private profile: without it, a headless launch just pokes the Chrome
-    // that's already open and exits without printing anything.
-    let profile = dir.join("browser-profile");
 
-    let mut cmd = tokio::process::Command::new(&browser);
-    paths::quiet_async(&mut cmd);
-    cmd.arg("--headless=new")
-        .arg("--disable-gpu")
-        .arg("--no-first-run")
-        .arg("--no-default-browser-check")
-        .arg("--disable-extensions")
-        .arg("--hide-scrollbars")
-        .arg("--no-pdf-header-footer")
-        .arg("--print-to-pdf-no-header")
-        .arg("--virtual-time-budget=25000")
-        .arg(format!("--user-data-dir={}", profile.display()))
-        .arg(format!("--print-to-pdf={}", pdf_path.display()))
-        .arg(file_url.as_str())
-        .stdin(Stdio::null())
-        .stdout(Stdio::null())
-        .stderr(Stdio::piped())
-        .kill_on_drop(true);
-    if cfg!(target_os = "linux") {
-        cmd.arg("--no-sandbox");
+    // The shared profile folder older builds used; its lock files are what
+    // made the browser refuse to start.
+    let _ = std::fs::remove_dir_all(dir.join("browser-profile"));
+
+    // Two tries: a browser that trips over its own start-up once usually
+    // doesn't the second time, and each try gets a brand-new profile.
+    let mut last_error = String::new();
+    for attempt in 0..2 {
+        match browser_to_pdf(&browser, file_url.as_str(), &pdf_path, attempt).await {
+            Ok(()) => {
+                last_error.clear();
+                break;
+            }
+            Err(e) => last_error = e,
+        }
     }
-
-    let out = tokio::time::timeout(Duration::from_secs(90), cmd.output())
-        .await
-        .map_err(|_| "The browser took more than 90 seconds to make the PDF.".to_string())?
-        .map_err(|e| format!("Couldn't start {}: {e}", browser.display()))?;
-
-    let size = std::fs::metadata(&pdf_path).map(|m| m.len()).unwrap_or(0);
-    if size < 2_000 {
-        let err = String::from_utf8_lossy(&out.stderr);
-        let tail: Vec<&str> = err.lines().rev().take(3).collect();
-        return Err(format!("The browser didn't produce a PDF. {}", wire::truncate(&tail.join(" | "), 300)));
+    if !last_error.is_empty() {
+        return Err(last_error);
     }
 
     // Housekeeping: keep two weeks of print files.
