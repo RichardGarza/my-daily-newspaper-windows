@@ -1,0 +1,149 @@
+{
+  "version": 1,
+  "interests": [
+    {
+      "id": "elon",
+      "name": "Elon Musk",
+      "kind": "person",
+      "value": "Elon Musk interview OR Tesla OR SpaceX OR xAI",
+      "notes": "New long-form interviews and podcast appearances first. Then real news on Tesla, SpaceX, Starship, xAI, Neuralink. Skip gossip.",
+      "enabled": true
+    },
+    {
+      "id": "jre",
+      "name": "The Joe Rogan Experience",
+      "kind": "youtube_channel",
+      "value": "@joerogan",
+      "notes": "Newest full episodes. Flag standout guests.",
+      "enabled": true
+    },
+    {
+      "id": "drake",
+      "name": "Drake",
+      "kind": "person",
+      "value": "Drake new song OR album OR release",
+      "notes": "Latest drops: singles, albums, features, videos. Release news only, not beef or gossip unless it comes with music.",
+      "enabled": true
+    },
+    {
+      "id": "drake-yt",
+      "name": "Drake (YouTube)",
+      "kind": "youtube_channel",
+      "value": "@DrakeOfficial",
+      "notes": "Official videos and releases.",
+      "enabled": true
+    },
+    {
+      "id": "ai-howto",
+      "name": "AI instructionals",
+      "kind": "topic",
+      "value": "Claude Code OR AI agents tutorial OR how to build with AI",
+      "notes": "Hands-on tutorials and walkthroughs: Claude, Claude Code, agents, MCP, local models, AI coding workflows. Prefer videos to learn from over hype.",
+      "enabled": true
+    },
+    {
+      "id": "anthropic-yt",
+      "name": "Anthropic (YouTube)",
+      "kind": "youtube_channel",
+      "value": "@anthropic-ai",
+      "notes": "",
+      "enabled": true
+    },
+    {
+      "id": "karpathy-yt",
+      "name": "Andrej Karpathy (YouTube)",
+      "kind": "youtube_channel",
+      "value": "@AndrejKarpathy",
+      "notes": "Deep technical AI explainers.",
+      "enabled": true
+    },
+    {
+      "id": "fireship-yt",
+      "name": "Fireship (YouTube)",
+      "kind": "youtube_channel",
+      "value": "@Fireship",
+      "notes": "Fast tech and dev news.",
+      "enabled": true
+    },
+    {
+      "id": "lex-yt",
+      "name": "Lex Fridman Podcast (YouTube)",
+      "kind": "youtube_channel",
+      "value": "@lexfridman",
+      "notes": "Long-form interviews, especially tech, AI and Elon.",
+      "enabled": true
+    },
+    {
+      "id": "ai-news",
+      "name": "AI news",
+      "kind": "topic",
+      "value": "Anthropic OR OpenAI OR xAI Grok new model release",
+      "notes": "New model releases, real capability jumps, tools a builder could actually use. Skip funding rounds and opinion pieces.",
+      "enabled": true
+    },
+    {
+      "id": "new-tech",
+      "name": "Interesting new tech",
+      "kind": "topic",
+      "value": "new technology breakthrough OR new gadget launch",
+      "notes": "Robots, rockets, batteries, chips, EVs, clever hardware. Things an engineer would forward to a friend.",
+      "enabled": true
+    },
+    {
+      "id": "tesla-owner",
+      "name": "Tesla owner news",
+      "kind": "topic",
+      "value": "Tesla FSD update OR Tesla software update",
+      "notes": "FSD releases, software updates, service and hardware retrofit news for owners.",
+      "enabled": true
+    },
+    {
+      "id": "dodgers",
+      "name": "LA Dodgers",
+      "kind": "topic",
+      "value": "Los Angeles Dodgers",
+      "notes": "Scores, standings, playoff picture, big roster moves.",
+      "enabled": true
+    },
+    {
+      "id": "fantasy-football",
+      "name": "Fantasy football",
+      "kind": "topic",
+      "value": "fantasy football waiver wire OR start sit this week",
+      "notes": "Weekly waiver targets, start/sit calls, injury news that changes lineups.",
+      "enabled": true
+    },
+    {
+      "id": "guitar",
+      "name": "Guitar",
+      "kind": "topic",
+      "value": "John Mayer OR Derek Trucks guitar",
+      "notes": "John Mayer and Derek Trucks: new music, live clips, tone and gear breakdowns. Beginner-friendly Strat lessons welcome.",
+      "enabled": true
+    },
+    {
+      "id": "firearms",
+      "name": "Firearms and gear",
+      "kind": "topic",
+      "value": "Glock new release OR pistol red dot OR suppressor",
+      "notes": "Glock news, pistol red dots, compensated carry guns, suppressors, 300 BLK and 6.5 Creedmoor. Reviews and new products over politics.",
+      "enabled": true
+    },
+    {
+      "id": "drones-aviation",
+      "name": "Drones and flying",
+      "kind": "topic",
+      "value": "DJI new drone OR private pilot general aviation",
+      "notes": "DJI releases, FPV, and private-pilot / general aviation news.",
+      "enabled": true
+    },
+    {
+      "id": "gamedev",
+      "name": "Game dev",
+      "kind": "topic",
+      "value": "Unreal Engine 5 OR three.js new release",
+      "notes": "Unreal Engine 5, Three.js, indie horror dev logs, useful tutorials.",
+      "enabled": true
+    }
+  ]
+}

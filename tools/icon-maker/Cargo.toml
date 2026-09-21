@@ -1,0 +1,15 @@
+[package]
+name = "icon-maker"
+version = "0.1.0"
+edition = "2021"
+description = "Draws the app icon: the owner's initials in the masthead font."
+publish = false
+
+[dependencies]
+ab_glyph = "0.2"
+png = "0.17"
+
+[profile.release]
+opt-level = 2
+
+[workspace]

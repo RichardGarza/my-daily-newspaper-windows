@@ -1,0 +1,31 @@
+[package]
+name = "my-daily-newspaper"
+version = "0.1.0"
+description = "My Daily Newspaper - a personal front page researched, written and laid out by Claude"
+edition = "2021"
+
+[lib]
+name = "my_daily_newspaper_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = ["image-png"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+tokio = { version = "1", features = ["process", "io-util", "time", "macros", "rt-multi-thread", "sync"] }
+reqwest = { version = "0.12", default-features = false, features = ["rustls-tls", "gzip", "brotli"] }
+roxmltree = "0.20"
+chrono = { version = "0.4", features = ["serde"] }
+regex = "1"
+url = "2"
+futures = "0.3"
+base64 = "0.22"
+qrcode = { version = "0.14", default-features = false, features = ["svg"] }
+
+[profile.release]
+opt-level = "s"
+lto = true
+strip = true
